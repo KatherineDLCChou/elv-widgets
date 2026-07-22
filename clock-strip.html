@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ELV Team Clocks</title>
+<style>
+  :root {
+    --navy: #0C0A33;          /* deck navy — time digits */
+    --label-gray: #7A82A6;    /* city label + names line */
+    --card-border: #D9E0F2;   /* light blue-gray card outline (comp) */
+    --card-bg: #FFFFFF;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: #FFFFFF;      /* blends into the Notion page */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .strip {
+    display: flex;
+    gap: 16px;
+    padding: 4px 2px;
+  }
+
+  .card {
+    flex: 1 1 0;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 14px 10px 12px;
+    text-align: center;
+    min-width: 0;
+  }
+
+  .city {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--label-gray);
+    margin-bottom: 4px;
+    white-space: nowrap;
+  }
+
+  .time {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--navy);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .names {
+    font-size: 11.5px;
+    color: var(--label-gray);
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Narrow embeds: stack gracefully */
+  @media (max-width: 520px) {
+    .strip { flex-direction: column; }
+    .names { white-space: normal; }
+  }
+</style>
+</head>
+<body>
+  <div class="strip">
+    <div class="card">
+      <div class="city">New York</div>
+      <div class="time" id="t-ny">--:--</div>
+      <div class="names">Kat &middot; Priyanka &middot; Samuel &middot; Nina &middot; ET</div>
+    </div>
+    <div class="card">
+      <div class="city">Boise</div>
+      <div class="time" id="t-boise">--:--</div>
+      <div class="names">Atharva &middot; MT</div>
+    </div>
+    <div class="card">
+      <div class="city">Riyadh</div>
+      <div class="time" id="t-riyadh">--:--</div>
+      <div class="names">Abdullah &middot; AST</div>
+    </div>
+  </div>
+
+<script>
+  const clocks = [
+    { id: "t-ny",     tz: "America/New_York" },
+    { id: "t-boise",  tz: "America/Boise" },
+    { id: "t-riyadh", tz: "Asia/Riyadh" }
+  ];
+
+  function render() {
+    for (const c of clocks) {
+      const s = new Intl.DateTimeFormat("en-US", {
+        hour: "numeric", minute: "2-digit", hour12: true, timeZone: c.tz
+      }).format(new Date());
+      document.getElementById(c.id).textContent = s;
+    }
+  }
+
+  render();
+  /* Tick on the minute boundary so all three flip together */
+  setTimeout(function tick() {
+    render();
+    setTimeout(tick, 60000 - (Date.now() % 60000));
+  }, 60000 - (Date.now() % 60000));
+</script>
+</body>
+</html>
